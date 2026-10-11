@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Products · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Master data</p>
+    <h2>Products</h2>
+    <p>Name and unit of measure.</p>
+  </div>
+  <a class="btn accent" href="{% url 'product-create' %}">New product</a>
+</div>
+<form class="searchbar" method="get">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search name or unit">
+  <button class="btn secondary" type="submit">Search</button>
+</form>
+<div class="card">
+  <table>
+    <thead><tr><th>Name</th><th>Unit</th><th>On hand</th></tr></thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td><a href="{% url 'product-detail' p.pk %}">{{ p.name }}</a></td>
+        <td>{{ p.unit }}</td>
+        <td>{{ p.on_hand_qty|default:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3" class="empty">No products yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Inbound · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Receiving</p>
+    <h2>Inbound shipments</h2>
+  </div>
+  <a class="btn accent" href="{% url 'inbound-create' %}">New inbound</a>
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>Number</th><th>Warehouse</th><th>Supplier</th><th>Status</th><th>Expected</th></tr></thead>
+    <tbody>
+      {% for s in shipments %}
+      <tr>
+        <td class="mono"><a href="{% url 'inbound-detail' s.pk %}">{{ s.number }}</a></td>
+        <td>{{ s.warehouse.code }}</td>
+        <td>{{ s.supplier_name }}</td>
+        <td><span class="pill {{ s.status }}">{{ s.get_status_display }}</span></td>
+        <td>{{ s.expected_date|default:"—" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="empty">No inbound shipments.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

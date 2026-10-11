@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Warehouses · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Master data</p>
+    <h2>Warehouses</h2>
+    <p>Code, name, and location.</p>
+  </div>
+  <a class="btn accent" href="{% url 'warehouse-create' %}">New warehouse</a>
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>Code</th><th>Name</th><th>Location</th><th>On hand</th></tr></thead>
+    <tbody>
+      {% for w in warehouses %}
+      <tr>
+        <td class="mono"><a href="{% url 'warehouse-detail' w.pk %}">{{ w.code }}</a></td>
+        <td>{{ w.name }}</td>
+        <td>{{ w.location }}</td>
+        <td>{{ w.on_hand }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="empty">No warehouses yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

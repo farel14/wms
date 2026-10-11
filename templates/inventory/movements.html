@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Movements · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Ledger</p>
+    <h2>Stock movements</h2>
+  </div>
+</div>
+<form class="searchbar" method="get">
+  <input type="text" name="q" value="{{ q }}" placeholder="SKU or reference">
+  <button class="btn secondary" type="submit">Search</button>
+</form>
+<div class="card">
+  <table>
+    <thead><tr><th>When</th><th>Type</th><th>SKU</th><th>Qty</th><th>From</th><th>To</th><th>Ref</th><th>User</th></tr></thead>
+    <tbody>
+      {% for m in movements %}
+      <tr>
+        <td>{{ m.created_at|date:"d M Y H:i" }}</td>
+        <td>{{ m.get_movement_type_display }}</td>
+        <td class="mono">{{ m.product.sku }}</td>
+        <td>{{ m.quantity }}</td>
+        <td class="mono">{{ m.from_location|default:"—" }}</td>
+        <td class="mono">{{ m.to_location|default:"—" }}</td>
+        <td class="mono">{{ m.reference }}</td>
+        <td>{{ m.created_by|default:"—" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8" class="empty">No movements recorded.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

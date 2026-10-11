@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Product</p>
+    <h2>{{ product.name }}</h2>
+    <p>Unit: {{ product.unit }} · Total on hand: {{ product.on_hand }}</p>
+  </div>
+  <a class="btn secondary" href="{% url 'product-update' product.pk %}">Edit product</a>
+</div>
+<div class="card">
+  <h3>Availability by warehouse</h3>
+  <table>
+    <thead><tr><th>Warehouse</th><th>Location</th><th>Quantity</th></tr></thead>
+    <tbody>
+      {% for s in stocks %}
+      <tr>
+        <td class="mono"><a href="{% url 'warehouse-detail' s.warehouse.pk %}">{{ s.warehouse.code }}</a> · {{ s.warehouse.name }}</td>
+        <td>{{ s.warehouse.location }}</td>
+        <td>{{ s.quantity }} {{ product.unit }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3" class="empty">No stock records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

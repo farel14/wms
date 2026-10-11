@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Stock ledger · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">History</p>
+    <h2>Stock ledger</h2>
+    <p>Append-only. Entries can be written when a transaction is posted, and never edited.</p>
+  </div>
+</div>
+<form class="searchbar" method="get">
+  <input type="text" name="q" value="{{ q }}" placeholder="Product, warehouse, or txn number">
+  <button class="btn secondary" type="submit">Search</button>
+</form>
+<div class="card">
+  <table>
+    <thead><tr><th>When</th><th>Txn</th><th>Product</th><th>Warehouse</th><th>Qty</th><th>Balance after</th><th>User</th></tr></thead>
+    <tbody>
+      {% for e in entries %}
+      <tr>
+        <td>{{ e.created_at|date:"d M Y H:i" }}</td>
+        <td class="mono"><a href="{% url 'transaction-detail' e.inventory_transaction.pk %}">{{ e.inventory_transaction.number }}</a></td>
+        <td>{{ e.product.name }}</td>
+        <td class="mono">{{ e.warehouse.code }}</td>
+        <td>{{ e.quantity }}</td>
+        <td>{{ e.balance_after }}</td>
+        <td>{{ e.created_by|default:"—" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="empty">No ledger entries yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}
