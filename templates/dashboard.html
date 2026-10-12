@@ -58,6 +58,7 @@
       <p class="empty">No inventory transactions yet.</p>
     {% endif %}
   </article>
+  {% if user.is_superuser %}
   <article class="card">
     <h3>Recent audit</h3>
     {% if recent_audit %}
@@ -78,4 +79,5 @@
     {% endif %}
   </article>
 </section>
+{% endif %}
 {% endblock %}

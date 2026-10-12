@@ -27,18 +27,20 @@
       <a href="{% url 'warehouse-list' %}" class="{% if 'warehouse' in request.resolver_match.url_name %}active{% endif %}">Warehouses</a>
       <a href="{% url 'stock-list' %}" class="{% if request.resolver_match.url_name == 'stock-list' %}active{% endif %}">Stock</a>
       <a href="{% url 'transaction-list' %}" class="{% if 'transaction' in request.resolver_match.url_name %}active{% endif %}">
-        Inventory txns {% if draft_txn_count %}<span class="badge">{{ draft_txn_count }}</span>{% endif %}
+        Inventory transactions {% if draft_txn_count %}<span class="badge">{{ draft_txn_count }}</span>{% endif %}
       </a>
       <a href="{% url 'ledger-list' %}" class="{% if request.resolver_match.url_name == 'ledger-list' %}active{% endif %}">Stock ledger</a>
-      <a href="{% url 'audit-list' %}" class="{% if request.resolver_match.url_name == 'audit-list' %}active{% endif %}">Audit</a>
-      <a href="{% url 'user-list' %}" class="{% if request.resolver_match.url_name == 'user-list' %}active{% endif %}">Users</a>
+      {% if user.is_superuser %}
+        <a href="{% url 'audit-list' %}" class="{% if request.resolver_match.url_name == 'audit-list' %}active{% endif %}">Audit</a>
+        <a href="{% url 'user-list' %}" class="{% if request.resolver_match.url_name == 'user-list' %}active{% endif %}">Users</a>
+      {% endif %}
     </nav>
     <div class="sidebar-foot">
       <div class="who">{{ user.get_full_name|default:user.username }}</div>
       <div class="role">{% if user.is_superuser %}Administrator{% elif user.is_staff %}Staff{% else %}User{% endif %}</div>
       <form method="post" action="{% url 'logout' %}" style="margin-top:12px">
         {% csrf_token %}
-        <button class="btn secondary small" type="submit">Sign out</button>
+        <button class="btn low-warn small" type="submit">Sign out</button>
       </form>
     </div>
   </aside>
@@ -57,4 +59,5 @@
   {% block guest %}{% endblock %}
 {% endif %}
 </body>
+<script src="{% static 'js/app.js' %}" defer></script>
 </html>
