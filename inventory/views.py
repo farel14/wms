@@ -79,7 +79,7 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         response = super().form_valid(form)
         log_audit(
             user=self.request.user,
-            action="CREATE",
+            action=Audit.Action.CREATE,
             table_name="InventoryTransaction",
             record_id=self.object.pk,
             description=f"Created {self.object.number}",

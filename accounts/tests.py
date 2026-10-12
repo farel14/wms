@@ -33,7 +33,7 @@ class AuditTestCase(TestCase):
             action=Audit.Action.LOGIN,
             table_name="User",
             record_id=self.user.pk,
-            description=f"{self.user.username} signed out",
+            description=f"{self.user.username} signed in",
         )
         audit = Audit.objects.filter(user=self.user).first()
         self.assertEqual(audit.action, Audit.Action.LOGIN)

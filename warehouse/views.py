@@ -30,7 +30,7 @@ class WarehouseCreateView(LoginRequiredMixin, CreateView):
         response = super().form_valid(form)
         log_audit(
             user=self.request.user,
-            action="CREATE",
+            action=Audit.Action.CREATE,
             table_name="Warehouse",
             record_id=self.object.pk,
             description=f"Created warehouse {self.object.code}",
@@ -56,7 +56,7 @@ class WarehouseUpdateView(LoginRequiredMixin, UpdateView):
         response = super().form_valid(form)
         log_audit(
             user=self.request.user,
-            action="UPDATE",
+            action=Audit.Action.UPDATE,
             table_name="Warehouse",
             record_id=self.object.pk,
             description=f"Updated warehouse {self.object.code}",

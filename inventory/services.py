@@ -63,7 +63,7 @@ def post_inventory_transaction(txn, user):
 
     log_audit(
         user=user,
-        action="POST",
+        action=Audit.Action.POST,
         table_name="InventoryTransaction",
         record_id=txn.pk,
         description=f"Posted {txn.number} ({txn.get_transaction_type_display()}) {txn.quantity} {txn.product.unit} of {txn.product.name}",
