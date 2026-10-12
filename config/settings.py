@@ -67,7 +67,10 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "wms"),
         "HOST": os.getenv("POSTGRES_HOST", "localhost"),
         "PORT": os.getenv("POSTGRES_PORT", "5432"),
-    }
+        "TEST": {
+            "NAME": os.getenv("POSTGRES_DB_TEST", "wms_test"),
+        },
+    },
 }
 
 AUTH_PASSWORD_VALIDATORS = [

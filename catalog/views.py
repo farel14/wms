@@ -4,7 +4,7 @@ from django.db.models import Q, Sum
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from accounts.models import log_audit
+from accounts.models import log_audit, Audit
 from inventory.models import Stock
 
 from .forms import ProductForm
@@ -44,7 +44,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         response = super().form_valid(form)
         log_audit(
             user=self.request.user,
-            action="CREATE",
+            action=Audit.Action.CREATE,
             table_name="Product",
             record_id=self.object.pk,
             description=f"Created product {self.object.name}",
@@ -70,7 +70,7 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
         response = super().form_valid(form)
         log_audit(
             user=self.request.user,
-            action="UPDATE",
+            action=Audit.Action.UPDATE,
             table_name="Product",
             record_id=self.object.pk,
             description=f"Updated product {self.object.name}",

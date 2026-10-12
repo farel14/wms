@@ -4,10 +4,20 @@ from django.db import models
 
 
 class Audit(models.Model):
+    # action enum
+    class Action(models.TextChoices):
+        LOGIN = 'LOGIN', 'Login'
+        LOGOUT = 'LOGOUT', 'Logout'
+        LOGIN_FAILED = 'LOGIN_FAILED', 'Login Failed'
+        CREATE = 'CREATE', 'Create'
+        UPDATE = 'UPDATE', 'Update'
+        POST = 'POST', 'Post'
+        TEST = 'TEST', 'Test'
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_entries"
     )
-    action = models.CharField(max_length=64)
+    action = models.CharField(max_length=64, choices=Action.choices)
     table_name = models.CharField(max_length=64, blank=True)
     record_id = models.CharField(max_length=64, blank=True)
     description = models.TextField()
