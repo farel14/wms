@@ -3,15 +3,20 @@ from django.db.models import Sum
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=160, unique=True)
+    sku = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=255)
     unit = models.CharField(max_length=16)
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "product"
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name} ({self.unit})"
+        return f"{self.sku} - {self.name} ({self.unit})"
 
     @property
     def on_hand(self):
