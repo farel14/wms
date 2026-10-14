@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, View
 
-from accounts.models import log_audit
+from accounts.models import log_audit, Audit
 
 from .forms import InventoryTransactionForm
 from .models import InventoryTransaction, Stock, StockLedger

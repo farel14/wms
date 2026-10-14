@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
-from accounts.models import log_audit
+from accounts.models import log_audit, Audit
 
 from .models import InventoryTransaction, Stock, StockLedger
 

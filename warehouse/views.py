@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from accounts.models import log_audit
+from accounts.models import log_audit, Audit
 from inventory.models import Stock
 
 from .forms import WarehouseForm
