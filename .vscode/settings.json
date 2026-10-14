@@ -4,7 +4,7 @@
         "-s",
         "./accounts",
         "-p",
-        "*tests.py"
+        "test*.py"
     ],
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
