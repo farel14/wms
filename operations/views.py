@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, View
 
-from inventory.services import pick_stock, receive_stock
+# from inventory.services import pick_stock, receive_stock
 
 from .forms import (
     InboundLineForm,
@@ -53,7 +53,7 @@ class InboundDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["line_form"] = InboundLineForm()
-        context["receive_form"] = ReceiveLineForm(warehouse=self.object.warehouse)
+        context["receive_form"] = ReceiveLineForm()
         return context
 
 
@@ -84,33 +84,34 @@ class InboundReceiveLineView(LoginRequiredMixin, View):
         if shipment.status == InboundShipment.Status.CANCELLED:
             messages.error(request, "Cancelled inbounds cannot be received.")
             return redirect("inbound-detail", pk=pk)
-        form = ReceiveLineForm(request.POST, warehouse=shipment.warehouse)
+        form = ReceiveLineForm(request.POST)
         if not form.is_valid():
             messages.error(request, "Provide a valid quantity and putaway location.")
             return redirect("inbound-detail", pk=pk)
         qty = form.cleaned_data["quantity"]
-        location = form.cleaned_data["location"]
-        if location.warehouse_id != shipment.warehouse_id:
-            messages.error(request, "Putaway location must belong to this warehouse.")
-            return redirect("inbound-detail", pk=pk)
+        # location = form.cleaned_data["location"]
+        # if location.warehouse_id != shipment.warehouse_id:
+        #     messages.error(request, "Putaway location must belong to this warehouse.")
+        #     return redirect("inbound-detail", pk=pk)
         if qty > line.remaining():
             messages.error(request, "Cannot receive more than the remaining expected quantity.")
             return redirect("inbound-detail", pk=pk)
         try:
-            with transaction.atomic():
-                receive_stock(
-                    product=line.product,
-                    location=location,
-                    quantity=qty,
-                    user=request.user,
-                    reference=shipment.number,
-                )
-                line.received_qty += qty
-                line.putaway_location = location
-                line.save(update_fields=["received_qty", "putaway_location"])
-                if shipment.status == InboundShipment.Status.DRAFT:
-                    shipment.status = InboundShipment.Status.RECEIVING
-                    shipment.save(update_fields=["status"])
+            pass
+            # with transaction.atomic():
+            #     receive_stock(
+            #         product=line.product,
+            #         location=location,
+            #         quantity=qty,
+            #         user=request.user,
+            #         reference=shipment.number,
+            #     )
+            #     line.received_qty += qty
+            #     line.putaway_location = location
+            #     line.save(update_fields=["received_qty", "putaway_location"])
+            #     if shipment.status == InboundShipment.Status.DRAFT:
+            #         shipment.status = InboundShipment.Status.RECEIVING
+            #         shipment.save(update_fields=["status"])
         except ValidationError as exc:
             messages.error(request, " ".join(exc.messages))
         else:
@@ -169,7 +170,7 @@ class OutboundDetailView(LoginRequiredMixin, DetailView):
         context["line_form"] = OutboundLineForm()
         lines = list(self.object.lines.select_related("product", "pick_location"))
         for line in lines:
-            line.pick_form = PickLineForm(warehouse=self.object.warehouse, product=line.product)
+            line.pick_form = PickLineForm()
         context["lines"] = lines
         return context
 
@@ -198,7 +199,7 @@ class OutboundPickLineView(LoginRequiredMixin, View):
     def post(self, request, pk, line_id):
         order = get_object_or_404(OutboundOrder, pk=pk)
         line = get_object_or_404(OutboundLine, pk=line_id, order=order)
-        form = PickLineForm(request.POST, warehouse=order.warehouse, product=line.product)
+        form = PickLineForm(request.POST)
         if not form.is_valid():
             messages.error(request, "Provide a valid quantity and pick location with stock.")
             return redirect("outbound-detail", pk=pk)
@@ -208,20 +209,21 @@ class OutboundPickLineView(LoginRequiredMixin, View):
             messages.error(request, "Cannot pick more than the remaining requested quantity.")
             return redirect("outbound-detail", pk=pk)
         try:
-            with transaction.atomic():
-                pick_stock(
-                    product=line.product,
-                    location=location,
-                    quantity=qty,
-                    user=request.user,
-                    reference=order.number,
-                )
-                line.picked_qty += qty
-                line.pick_location = location
-                line.save(update_fields=["picked_qty", "pick_location"])
-                if order.status == OutboundOrder.Status.DRAFT:
-                    order.status = OutboundOrder.Status.PICKING
-                    order.save(update_fields=["status"])
+            pass
+            # with transaction.atomic():
+                # pick_stock(
+                #     product=line.product,
+                #     location=location,
+                #     quantity=qty,
+                #     user=request.user,
+                #     reference=order.number,
+                # )
+                # line.picked_qty += qty
+                # line.pick_location = location
+                # line.save(update_fields=["picked_qty", "pick_location"])
+                # if order.status == OutboundOrder.Status.DRAFT:
+                #     order.status = OutboundOrder.Status.PICKING
+                #     order.save(update_fields=["status"])
         except ValidationError as exc:
             messages.error(request, " ".join(exc.messages))
         else:

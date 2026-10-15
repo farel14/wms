@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 
 from catalog.models import Product
-from warehouse.models import Location, Warehouse
+from warehouse.models import Warehouse
 
 
 def next_document_number(model, prefix, field="number"):
@@ -52,7 +52,7 @@ class InboundLine(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     expected_qty = models.PositiveIntegerField()
     received_qty = models.PositiveIntegerField(default=0)
-    putaway_location = models.ForeignKey(Location, on_delete=models.PROTECT, null=True, blank=True)
+    putaway_location = models.CharField(max_length=100, blank=True)
 
     class Meta:
         unique_together = ("shipment", "product")
@@ -97,7 +97,7 @@ class OutboundLine(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     requested_qty = models.PositiveIntegerField()
     picked_qty = models.PositiveIntegerField(default=0)
-    pick_location = models.ForeignKey(Location, on_delete=models.PROTECT, null=True, blank=True)
+    pick_location = models.CharField(max_length=100, blank=True)
 
     class Meta:
         unique_together = ("order", "product")

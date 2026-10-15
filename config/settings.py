@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "warehouse",
     "catalog",
     "inventory",
+    "operations"
 ]
 
 MIDDLEWARE = [

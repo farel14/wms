@@ -1,7 +1,6 @@
 from django import forms
 
 from catalog.models import Product
-from warehouse.models import Location
 
 from .models import InboundLine, InboundShipment, OutboundLine, OutboundOrder
 
@@ -25,12 +24,10 @@ class InboundLineForm(forms.ModelForm):
 
 class ReceiveLineForm(forms.Form):
     quantity = forms.IntegerField(min_value=1)
-    location = forms.ModelChoiceField(queryset=Location.objects.none())
+    location = forms.CharField(max_length=100, empty_value="")
 
-    def __init__(self, *args, warehouse=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if warehouse:
-            self.fields["location"].queryset = Location.objects.filter(warehouse=warehouse, is_active=True)
 
 
 class OutboundOrderForm(forms.ModelForm):
@@ -52,13 +49,7 @@ class OutboundLineForm(forms.ModelForm):
 
 class PickLineForm(forms.Form):
     quantity = forms.IntegerField(min_value=1)
-    location = forms.ModelChoiceField(queryset=Location.objects.none())
+    location = forms.CharField(max_length=100, empty_value="")
 
-    def __init__(self, *args, warehouse=None, product=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        qs = Location.objects.filter(is_active=True)
-        if warehouse:
-            qs = qs.filter(warehouse=warehouse)
-        if product:
-            qs = qs.filter(balances__product=product, balances__quantity__gt=0)
-        self.fields["location"].queryset = qs.distinct()
