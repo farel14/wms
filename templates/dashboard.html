@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Dashboard · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Operations board</p>
+    <h2>Stock position</h2>
+    <p>Master data, available stock, posted events, and user activity.</p>
+  </div>
+  <div class="actions">
+    <a class="btn accent" href="{% url 'transaction-create' %}">New inventory transaction</a>
+  </div>
+</div>
+
+<section class="grid stats">
+  <article class="card stat">
+    <div class="label">Units on hand</div>
+    <div class="value">{{ on_hand|intcomma }}</div>
+    <div class="hint">{{ product_count }} products</div>
+  </article>
+  <article class="card stat">
+    <div class="label">Warehouses</div>
+    <div class="value">{{ warehouse_count }}</div>
+    <div class="hint">Stock is held per warehouse</div>
+  </article>
+  <article class="card stat">
+    <div class="label">Draft transactions</div>
+    <div class="value">{{ draft_txns }}</div>
+    <div class="hint">Waiting to post</div>
+  </article>
+  <article class="card stat">
+    <div class="label">Posted transactions</div>
+    <div class="value">{{ posted_txns }}</div>
+    <div class="hint">Written to the ledger</div>
+  </article>
+</section>
+
+<section class="grid split" style="margin-top:16px">
+  <article class="card">
+    <h3>Recent inventory transactions</h3>
+    {% if recent_txns %}
+    <table>
+      <thead><tr><th>Number</th><th>Type</th><th>Product</th><th>Qty</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for t in recent_txns %}
+        <tr>
+          <td class="mono"><a href="{% url 'transaction-detail' t.pk %}">{{ t.number }}</a></td>
+          <td>{{ t.get_transaction_type_display }}</td>
+          <td>{{ t.product.name }}</td>
+          <td>{{ t.quantity }}</td>
+          <td><span class="pill {{ t.status }}">{{ t.get_status_display }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="empty">No inventory transactions yet.</p>
+    {% endif %}
+  </article>
+  {% if user.is_superuser %}
+  <article class="card">
+    <h3>Recent audit</h3>
+    {% if recent_audit %}
+    <table>
+      <thead><tr><th>When</th><th>User</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for a in recent_audit %}
+        <tr>
+          <td class="muted">{{ a.created_at|date:"d M H:i" }}</td>
+          <td>{{ a.user|default:"system" }}</td>
+          <td>{{ a.action }}<br><span class="muted">{{ a.description }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="empty">No audit entries yet.</p>
+    {% endif %}
+  </article>
+</section>
+{% endif %}
+{% endblock %}

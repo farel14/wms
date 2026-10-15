@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Harbor WMS{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+{% if user.is_authenticated %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">H</div>
+      <div>
+        <h1>Harbor WMS</h1>
+        <p>Stock control</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+      <a href="{% url 'product-list' %}" class="{% if 'product' in request.resolver_match.url_name %}active{% endif %}">Products</a>
+      <a href="{% url 'warehouse-list' %}" class="{% if 'warehouse' in request.resolver_match.url_name %}active{% endif %}">Warehouses</a>
+      <a href="{% url 'stock-list' %}" class="{% if request.resolver_match.url_name == 'stock-list' %}active{% endif %}">Stock</a>
+      <a href="{% url 'transaction-list' %}" class="{% if 'transaction' in request.resolver_match.url_name %}active{% endif %}">
+        Inventory transactions {% if draft_txn_count %}<span class="badge">{{ draft_txn_count }}</span>{% endif %}
+      </a>
+      <a href="{% url 'ledger-list' %}" class="{% if request.resolver_match.url_name == 'ledger-list' %}active{% endif %}">Stock ledger</a>
+      {% if user.is_superuser %}
+        <a href="{% url 'audit-list' %}" class="{% if request.resolver_match.url_name == 'audit-list' %}active{% endif %}">Audit</a>
+        <a href="{% url 'user-list' %}" class="{% if request.resolver_match.url_name == 'user-list' %}active{% endif %}">Users</a>
+      {% endif %}
+    </nav>
+    <div class="sidebar-foot">
+      <div class="who">{{ user.get_full_name|default:user.username }}</div>
+      <div class="role">{% if user.is_superuser %}Administrator{% elif user.is_staff %}Staff{% else %}User{% endif %}</div>
+      <form method="post" action="{% url 'logout' %}" style="margin-top:12px">
+        {% csrf_token %}
+        <button class="btn low-warn small" type="submit">Sign out</button>
+      </form>
+    </div>
+  </aside>
+  <main class="main">
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% else %}
+  {% block guest %}{% endblock %}
+{% endif %}
+</body>
+<script src="{% static 'js/app.js' %}" defer></script>
+</html>

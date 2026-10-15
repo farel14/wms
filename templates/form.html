@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Form</p>
+    <h2>{{ title }}</h2>
+  </div>
+</div>
+<div class="card" style="max-width:640px">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn accent" type="submit">{{ submit_label|default:"Save" }}</button>
+  </form>
+</div>
+{% endblock %}

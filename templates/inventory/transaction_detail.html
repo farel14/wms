@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ inventorytransaction.number }} · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Inventory transaction</p>
+    <h2>{{ inventorytransaction.number }}</h2>
+    <p>{{ inventorytransaction.get_transaction_type_display }} · {{ inventorytransaction.product.name }}</p>
+  </div>
+  <span class="pill {{ inventorytransaction.status }}">{{ inventorytransaction.get_status_display }}</span>
+</div>
+<section class="grid split">
+  <article class="card">
+    <p><span class="muted">Warehouse</span><br>{{ inventorytransaction.warehouse }}</p>
+    {% if inventorytransaction.destination_warehouse %}
+    <p><span class="muted">Destination</span><br>{{ inventorytransaction.destination_warehouse }}</p>
+    {% endif %}
+    <p><span class="muted">Quantity</span><br>{{ inventorytransaction.quantity }} {{ inventorytransaction.product.unit }}</p>
+    <p><span class="muted">Notes</span><br>{{ inventorytransaction.notes|default:"—" }}</p>
+    <p><span class="muted">Created</span><br>{{ inventorytransaction.created_by }} · {{ inventorytransaction.created_at }}</p>
+    {% if inventorytransaction.posted_at %}
+    <p><span class="muted">Posted</span><br>{{ inventorytransaction.posted_at }}</p>
+    {% endif %}
+    {% if inventorytransaction.status == "DRAFT" %}
+    <form method="post" action="{% url 'transaction-post' inventorytransaction.pk %}" style="margin-top:16px">
+      {% csrf_token %}
+      <button class="btn accent" type="submit">Post transaction</button>
+    </form>
+    <p class="help">Posting writes the stock ledger and updates warehouse availability. After that this record cannot be edited.</p>
+    {% endif %}
+  </article>
+  <article class="card">
+    <h3>Ledger entries</h3>
+    <table>
+      <thead><tr><th>Warehouse</th><th>Qty</th><th>Balance after</th></tr></thead>
+      <tbody>
+        {% for e in inventorytransaction.ledger_entries.all %}
+        <tr>
+          <td class="mono">{{ e.warehouse.code }}</td>
+          <td>{{ e.quantity }}</td>
+          <td>{{ e.balance_after }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="empty">Nothing posted yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </article>
+</section>
+{% endblock %}

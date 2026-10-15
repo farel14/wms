@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Inventory transactions · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Events</p>
+    <h2>Inventory transactions</h2>
+    <p>Stock in, stock out, warehouse transfer, and adjustment.</p>
+  </div>
+  <a class="btn accent" href="{% url 'transaction-create' %}">New transaction</a>
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>Number</th><th>Type</th><th>Product</th><th>Warehouse</th><th>Qty</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for t in transactions %}
+      <tr>
+        <td class="mono"><a href="{% url 'transaction-detail' t.pk %}">{{ t.number }}</a></td>
+        <td>{{ t.get_transaction_type_display }}</td>
+        <td>{{ t.product.name }}</td>
+        <td class="mono">{{ t.warehouse.code }}{% if t.destination_warehouse %} → {{ t.destination_warehouse.code }}{% endif %}</td>
+        <td>{{ t.quantity }} {{ t.product.unit }}</td>
+        <td><span class="pill {{ t.status }}">{{ t.get_status_display }}</span></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="empty">No inventory transactions yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

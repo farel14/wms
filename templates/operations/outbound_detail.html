@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ outboundorder.number }} · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Outbound</p>
+    <h2>{{ outboundorder.number }}</h2>
+    <p>{{ outboundorder.customer_name }} · {{ outboundorder.warehouse }}</p>
+  </div>
+  <span class="pill {{ outboundorder.status }}">{{ outboundorder.get_status_display }}</span>
+</div>
+<section class="grid split">
+  <article class="card">
+    <h3>Lines</h3>
+    <table>
+      <thead><tr><th>SKU</th><th>Requested</th><th>Picked</th><th>From</th></tr></thead>
+      <tbody>
+        {% for line in lines %}
+        <tr>
+          <td class="mono">{{ line.product.sku }}<br><span class="muted">{{ line.product.name }}</span></td>
+          <td>{{ line.requested_qty }}</td>
+          <td>{{ line.picked_qty }}</td>
+          <td class="mono">{{ line.pick_location|default:"—" }}</td>
+        </tr>
+        {% if outboundorder.status != "SHIPPED" and outboundorder.status != "CANCELLED" and line.remaining %}
+        <tr>
+          <td colspan="4">
+            <form method="post" action="{% url 'outbound-pick-line' outboundorder.pk line.pk %}" class="inline-form">
+              {% csrf_token %}
+              {{ line.pick_form.as_p }}
+              <button class="btn small accent" type="submit">Pick remaining {{ line.remaining }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endif %}
+        {% empty %}
+        <tr><td colspan="4" class="empty">Add products to pick.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if outboundorder.status != "SHIPPED" and outboundorder.status != "CANCELLED" %}
+    <form method="post" action="{% url 'outbound-ship' outboundorder.pk %}" style="margin-top:16px">
+      {% csrf_token %}
+      <button class="btn" type="submit">Mark shipped</button>
+    </form>
+    {% endif %}
+  </article>
+  <article class="card">
+    <h3>Add line</h3>
+    {% if outboundorder.status == "SHIPPED" or outboundorder.status == "CANCELLED" %}
+      <p class="muted">This document is closed.</p>
+    {% else %}
+    <form method="post" action="{% url 'outbound-add-line' outboundorder.pk %}">
+      {% csrf_token %}
+      {{ line_form.as_p }}
+      <button class="btn small" type="submit">Add SKU</button>
+    </form>
+    {% endif %}
+    <p class="muted">{{ outboundorder.notes }}</p>
+  </article>
+</section>
+{% endblock %}

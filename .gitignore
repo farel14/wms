@@ -7,4 +7,6 @@ staticfiles/
 media/
 .DS_Store
 *.log
+.pytest_cache
 .coverage
+.coverage.*

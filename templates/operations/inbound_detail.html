@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ inboundshipment.number }} · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Inbound</p>
+    <h2>{{ inboundshipment.number }}</h2>
+    <p>{{ inboundshipment.supplier_name }} · {{ inboundshipment.warehouse }}</p>
+  </div>
+  <span class="pill {{ inboundshipment.status }}">{{ inboundshipment.get_status_display }}</span>
+</div>
+<section class="grid split">
+  <article class="card">
+    <h3>Lines</h3>
+    <table>
+      <thead><tr><th>SKU</th><th>Expected</th><th>Received</th><th>Putaway</th></tr></thead>
+      <tbody>
+        {% for line in inboundshipment.lines.all %}
+        <tr>
+          <td class="mono">{{ line.product.sku }}<br><span class="muted">{{ line.product.name }}</span></td>
+          <td>{{ line.expected_qty }}</td>
+          <td>{{ line.received_qty }}</td>
+          <td class="mono">{{ line.putaway_location|default:"—" }}</td>
+        </tr>
+        {% if inboundshipment.status != "COMPLETED" and inboundshipment.status != "CANCELLED" and line.remaining %}
+        <tr>
+          <td colspan="4">
+            <form method="post" action="{% url 'inbound-receive-line' inboundshipment.pk line.pk %}" class="inline-form">
+              {% csrf_token %}
+              {{ receive_form.as_p }}
+              <button class="btn small accent" type="submit">Receive remaining {{ line.remaining }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endif %}
+        {% empty %}
+        <tr><td colspan="4" class="empty">Add products to receive.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if inboundshipment.status != "COMPLETED" and inboundshipment.status != "CANCELLED" %}
+    <form method="post" action="{% url 'inbound-complete' inboundshipment.pk %}" style="margin-top:16px">
+      {% csrf_token %}
+      <button class="btn" type="submit">Complete inbound</button>
+    </form>
+    {% endif %}
+  </article>
+  <article class="card">
+    <h3>Add line</h3>
+    {% if inboundshipment.status == "COMPLETED" or inboundshipment.status == "CANCELLED" %}
+      <p class="muted">This document is closed.</p>
+    {% else %}
+    <form method="post" action="{% url 'inbound-add-line' inboundshipment.pk %}">
+      {% csrf_token %}
+      {{ line_form.as_p }}
+      <button class="btn small" type="submit">Add SKU</button>
+    </form>
+    {% endif %}
+    <p class="muted">{{ inboundshipment.notes }}</p>
+  </article>
+</section>
+{% endblock %}

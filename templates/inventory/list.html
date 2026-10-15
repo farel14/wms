@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}On-hand stock · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Inventory</p>
+    <h2>On-hand stock</h2>
+  </div>
+  <div class="actions">
+    <a class="btn secondary" href="{% url 'inventory-transfer' %}">Transfer</a>
+    <a class="btn" href="{% url 'inventory-adjust' %}">Adjust</a>
+  </div>
+</div>
+<form class="searchbar" method="get">
+  {{ filter_form.q }}
+  {{ filter_form.warehouse }}
+  <button class="btn secondary" type="submit">Filter</button>
+</form>
+<div class="card">
+  <table>
+    <thead><tr><th>SKU</th><th>Product</th><th>Warehouse</th><th>Location</th><th>Qty</th></tr></thead>
+    <tbody>
+      {% for b in balances %}
+      <tr>
+        <td class="mono"><a href="{% url 'product-detail' b.product.pk %}">{{ b.product.sku }}</a></td>
+        <td>{{ b.product.name }}</td>
+        <td>{{ b.location.warehouse.code }}</td>
+        <td class="mono">{{ b.location.code }}</td>
+        <td>{{ b.quantity }} {{ b.product.unit }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="empty">No stock on hand.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}

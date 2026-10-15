@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Audit · Harbor WMS{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div>
+    <p class="eyebrow">History</p>
+    <h2>Audit</h2>
+    <p>User activity. Written automatically, never edited.</p>
+  </div>
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>When</th><th>User</th><th>Action</th><th>Table</th><th>Record</th><th>Description</th></tr></thead>
+    <tbody>
+      {% for e in entries %}
+      <tr>
+        <td>{{ e.created_at|date:"d M Y H:i" }}</td>
+        <td>{{ e.user|default:"system" }}</td>
+        <td>{{ e.action }}</td>
+        <td class="mono">{{ e.table_name|default:"—" }}</td>
+        <td class="mono">{{ e.record_id|default:"—" }}</td>
+        <td>{{ e.description }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="empty">No audit history yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "includes/pagination.html" %}
+</div>
+{% endblock %}
