@@ -59,6 +59,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+prefix = "WMS_" if os.getenv("ENVIRONMENT") == "production" else ""
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
