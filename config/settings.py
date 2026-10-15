@@ -60,16 +60,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+prefix = "WMS_" if os.getenv("ENVIRONMENT") == "production" else ""
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "wms"),
-        "USER": os.getenv("POSTGRES_USER", "wms"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "wms"),
-        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
-        "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        "NAME": os.getenv(f"{prefix}POSTGRES_DB", "wms"),
+        "USER": os.getenv(f"{prefix}POSTGRES_USER", "wms"),
+        "PASSWORD": os.getenv(f"{prefix}POSTGRES_PASSWORD", "wms"),
+        "HOST": os.getenv(f"{prefix}POSTGRES_HOST", "localhost"),
+        "PORT": os.getenv(f"{prefix}POSTGRES_PORT", "5432"),
         "TEST": {
-            "NAME": os.getenv("POSTGRES_DB_TEST", "wms_test"),
+            "NAME": os.getenv(f"{prefix}POSTGRES_DB_TEST", "wms_test"),
         },
     },
 }
