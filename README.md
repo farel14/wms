@@ -18,6 +18,16 @@ Stock quantity changes only when an inventory transaction is **posted**. Posting
 
 ## Setup
 
+for development
+```bash
+cd wms
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+cp .env.example .env
+```
+
+for production:
 ```bash
 cd wms
 python3 -m venv .venv
@@ -26,6 +36,7 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
+setup db and run:
 ```bash
 psql postgres -c "CREATE USER wms WITH PASSWORD 'wms';"
 psql postgres -c "CREATE DATABASE wms OWNER wms;"
