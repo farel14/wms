@@ -17,7 +17,7 @@ class StockListView(LoginRequiredMixin, ListView):
     model = Stock
     template_name = "inventory/stock_list.html"
     context_object_name = "stocks"
-    paginate_by = 40
+    paginate_by = 20
 
     def get_queryset(self):
         qs = Stock.objects.select_related("product", "warehouse")
@@ -38,7 +38,7 @@ class LedgerListView(LoginRequiredMixin, ListView):
     model = StockLedger
     template_name = "inventory/ledger_list.html"
     context_object_name = "entries"
-    paginate_by = 40
+    paginate_by = 20
 
     def get_queryset(self):
         qs = StockLedger.objects.select_related("product", "warehouse", "inventory_transaction", "created_by")
@@ -61,7 +61,7 @@ class TransactionListView(LoginRequiredMixin, ListView):
     model = InventoryTransaction
     template_name = "inventory/transaction_list.html"
     context_object_name = "transactions"
-    paginate_by = 25
+    paginate_by = 15
 
 
 class TransactionCreateView(LoginRequiredMixin, CreateView):
