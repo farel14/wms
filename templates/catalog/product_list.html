@@ -15,10 +15,11 @@
 </form>
 <div class="card">
   <table>
-    <thead><tr><th>Name</th><th>Unit</th><th>On hand</th></tr></thead>
+    <thead><tr><th>SKU</th><th>Name</th><th>Unit</th><th>On hand</th></tr></thead>
     <tbody>
       {% for p in products %}
       <tr>
+        <td>{{ p.sku }}</td>
         <td><a href="{% url 'product-detail' p.pk %}">{{ p.name }}</a></td>
         <td>{{ p.unit }}</td>
         <td>{{ p.on_hand_qty|default:0 }}</td>
