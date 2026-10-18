@@ -87,8 +87,8 @@ button, input, select, textarea { font: inherit; }
 }
 .btn.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 .btn.low-warn { background: var(--low-warn); color: var(--line); border: 1px solid var(--muted); }
-.btn.accent { background: var(--accent); color: var(--card)}
-.btn.danger { background: var(--bad); }
+.btn.accent { background: var(--accent); color: var(--card); }
+.btn.danger { background: var(--bad); color: var(--card); }
 .btn.small { padding: 7px 12px; font-size: 13px; }
 
 .grid { display: grid; gap: 16px; }

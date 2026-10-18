@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Sum
+from core.models import ActiveQuerySet
 
 
 def next_sku(model, prefix="SKU", field="sku"):
@@ -18,7 +19,8 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    
+    objects = ActiveQuerySet.as_manager()
     class Meta:
         db_table = "product"
         ordering = ["name"]

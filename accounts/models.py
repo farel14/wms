@@ -11,6 +11,8 @@ class Audit(models.Model):
         LOGIN_FAILED = 'LOGIN_FAILED', 'Login Failed'
         CREATE = 'CREATE', 'Create'
         UPDATE = 'UPDATE', 'Update'
+        DEACTIVATE = 'DEACTIVATE', 'Deactivate'
+        ACTIVATE = 'ACTIVATE', 'Activate'
         POST = 'POST', 'Post'
         TEST = 'TEST', 'Test'
 
