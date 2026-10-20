@@ -1,7 +1,9 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.shortcuts import get_object_or_404, redirect
+
 
 from accounts.models import log_audit, Audit
 from inventory.models import Stock
@@ -66,6 +68,64 @@ class WarehouseUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse("warehouse-detail", args=[self.object.pk])
+
+
+class WarehouseLockOpnameView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Warehouse
+    form_class = WarehouseForm
+    template_name = "form.html"
+    raise_exception = True
+    http_method_names = ["post", "options"]
+
+    
+    def test_func(self):
+        # Checks if user is logged in AND is a superuser
+        return self.request.user.is_authenticated and self.request.user.is_superuser 
+
+    def post(self, request, pk):
+        warehouse = get_object_or_404(Warehouse, pk=pk)
+
+        warehouse.is_opname = True
+        warehouse.save(update_fields=["is_opname"])
+        
+        log_audit(
+            user=self.request.user,
+            action=Audit.Action.LOCK_OPNAME,
+            table_name="Warehouse",
+            record_id=warehouse.pk,
+            description=f"Lock opname warehouse {warehouse.name}",
+        )
+
+        return redirect("warehouse-list")
+
+
+class WarehouseUnlockOpnameView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Warehouse
+    form_class = WarehouseForm
+    template_name = "form.html"
+    raise_exception = True
+    http_method_names = ["post", "options"]
+
+    
+    def test_func(self):
+        # Checks if user is logged in AND is a superuser
+        return self.request.user.is_authenticated and self.request.user.is_superuser 
+
+    def post(self, request, pk):
+        warehouse = get_object_or_404(Warehouse, pk=pk)
+
+        warehouse.is_opname = False
+        warehouse.save(update_fields=["is_opname"])
+        
+        log_audit(
+            user=self.request.user,
+            action=Audit.Action.UNLOCK_OPNAME,
+            table_name="Warehouse",
+            record_id=warehouse.pk,
+            description=f"Unlock opname warehouse {warehouse.name}",
+        )
+
+        return redirect("warehouse-list")
 
 
 class WarehouseDetailView(LoginRequiredMixin, DetailView):

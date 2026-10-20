@@ -14,6 +14,8 @@ class Audit(models.Model):
         DEACTIVATE = 'DEACTIVATE', 'Deactivate'
         ACTIVATE = 'ACTIVATE', 'Activate'
         POST = 'POST', 'Post'
+        LOCK_OPNAME = 'LOCK_OPNAME', 'Lock_Opname'
+        UNLOCK_OPNAME = 'UNLOCK_OPNAME', 'Unlock_Opname'
         TEST = 'TEST', 'Test'
 
     user = models.ForeignKey(
