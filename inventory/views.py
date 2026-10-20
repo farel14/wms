@@ -86,9 +86,8 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
             )
             return self.form_invalid(form)
         
-        # check if warehouse opname is happening at the moment
-        destination_warehouse = form.cleaned_data["destination_warehouse"]
-        if destination_warehouse.is_opname and not self.request.user.is_superuser:
+        destination_warehouse = form.cleaned_data.get("destination_warehouse")
+        if destination_warehouse and destination_warehouse.is_opname and not self.request.user.is_superuser:
             form.add_error(
                 "destination_warehouse",
                 "Cannot create transactions during stock opname.",
