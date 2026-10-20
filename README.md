@@ -45,4 +45,9 @@ python manage.py seed_demo
 python manage.py runserver
 ```
 
+for running shell, testing:
+```bash
+python manage.py shell
+```
+
 Open http://127.0.0.1:8000 — `admin / admin123` or `operator / operator123`.
