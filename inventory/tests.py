@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.db import IntegrityError
 
 from catalog.models import Product
 from warehouse.models import Warehouse
@@ -9,14 +10,16 @@ from accounts.models import Audit as AuditLog
 
 from .models import InventoryTransaction, Stock, StockLedger
 from .services import post_inventory_transaction
+from faker import Faker
 
 
 class InventoryModelTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user("tester", password="pass12345")
+        self.fake = Faker()
+        self.user = get_user_model().objects.create_user(self.fake.user_name(), password=self.fake.password(length=8))
         self.jkt = Warehouse.objects.create(code="JKT", name="Jakarta", location="Cakung")
         self.sby = Warehouse.objects.create(code="SBY", name="Surabaya", location="Rungkut")
-        self.product = Product.objects.create(name="Widget", unit="EA")
+        self.product = Product.objects.create(name="Mineral Water", unit="EA")
 
     def _txn(self, **kwargs):
         data = {
@@ -28,6 +31,21 @@ class InventoryModelTests(TestCase):
         }
         data.update(kwargs)
         return InventoryTransaction.objects.create(**data)
+    
+    #* on the database level
+    def test_cannot_create_negative_inventory(self):
+        with self.assertRaises(IntegrityError):
+            Stock.objects.create(
+                product = self.product,
+                warehouse = self.jkt,
+                quantity = -2
+            )
+    
+    #* on the logic level
+    def test_cannot_post_negative_inventory(self):
+        txn = self._txn(quantity=-2)
+        with self.assertRaises(ValidationError):
+            post_inventory_transaction(txn, self.user)
 
     def test_post_in_updates_stock_and_ledger(self):
         txn = self._txn(quantity=10)
