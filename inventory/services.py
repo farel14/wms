@@ -33,8 +33,19 @@ def _apply_delta(*, product, warehouse, quantity, txn, user):
 
 
 def post_inventory_transaction(txn, user):
+    # check if transaction already posted
     if txn.status == InventoryTransaction.Status.POSTED:
         raise ValidationError("This transaction is already posted.")
+    # check if warehouse opname is happening at the moment
+    warehouse = txn.warehouse
+    if warehouse.is_opname and not user.is_superuser:
+        raise ValidationError("This transaction belongs to a warehouse undergoing stock opname")
+    # check if destination warehouse opname is happening at the moment
+    destination_warehouse = txn.destination_warehouse
+    if destination_warehouse:
+        if destination_warehouse.is_opname and not user.is_superuser:
+            raise ValidationError("This transaction belongs to a warehouse undergoing stock opname")
+    
     txn.clean()
     with transaction.atomic():
         txn = InventoryTransaction.objects.select_for_update().get(pk=txn.pk)

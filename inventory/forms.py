@@ -14,7 +14,21 @@ class InventoryTransactionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["warehouse"].queryset = Warehouse.objects.all()
+        self.fields["warehouse"].label_from_instance = (
+            lambda warehouse: (
+                f"{warehouse} [In Opname]"
+                if warehouse.is_opname
+                else str(warehouse)
+            )
+        )
         self.fields["destination_warehouse"].queryset = Warehouse.objects.all()
+        self.fields["destination_warehouse"].label_from_instance = (
+            lambda warehouse: (
+                f"{warehouse} [In Opname]"
+                if warehouse.is_opname
+                else str(warehouse)
+            )
+        )
         self.fields["destination_warehouse"].required = False
         self.fields["product"].queryset = Product.objects.all()
         self.fields["quantity"].help_text = "Use a positive number. For adjustments, negative reduces stock."
