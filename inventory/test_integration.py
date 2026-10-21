@@ -77,6 +77,19 @@ class InventoryViewIntegrationTests(TestCase):
         self.assertContains(stock_list, "Mineral Water")
         self.assertContains(stock_list, "JKT")
 
+        second_post = self.client.post(reverse("transaction-post", args=[txn.pk]), follow=True)
+        self.assertContains(second_post, "This transaction is already posted.")
+        self.assertEqual(Stock.objects.get(product=self.product, warehouse=self.jkt).quantity, 10)
+        self.assertEqual(StockLedger.objects.count(), 1)
+        self.assertEqual(
+            Audit.objects.filter(
+                action=Audit.Action.POST,
+                table_name="InventoryTransaction",
+                record_id=str(txn.pk),
+            ).count(),
+            1,
+        )
+
     def test_create_and_post_transfer_moves_stock(self):
         self.client.post(reverse("transaction-create"), self._create_payload(quantity=10))
         inbound = InventoryTransaction.objects.get()
