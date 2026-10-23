@@ -60,7 +60,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-prefix = "WMS_" if os.getenv("ENVIRONMENT") == "production" else ""
+# prefix = "WMS_" if os.getenv("ENVIRONMENT") == "production" else ""
+prefix = ""
 
 DATABASES = {
     "default": {
