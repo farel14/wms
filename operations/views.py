@@ -24,7 +24,7 @@ class InboundListView(LoginRequiredMixin, ListView):
     model = InboundShipment
     template_name = "operations/inbound_list.html"
     context_object_name = "shipments"
-    paginate_by = 25
+    paginate_by = 20
 
 
 class InboundCreateView(LoginRequiredMixin, CreateView):
@@ -138,7 +138,7 @@ class OutboundListView(LoginRequiredMixin, ListView):
     model = OutboundOrder
     template_name = "operations/outbound_list.html"
     context_object_name = "orders"
-    paginate_by = 25
+    paginate_by = 20
 
 
 class OutboundCreateView(LoginRequiredMixin, CreateView):

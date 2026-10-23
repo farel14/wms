@@ -7,7 +7,30 @@
     <h2>{{ product.name }}</h2>
     <p>Unit: {{ product.unit }} · Total on hand: {{ product.on_hand }}</p>
   </div>
-  <a class="btn secondary" href="{% url 'product-update' product.pk %}">Edit product</a>
+  {% if user.is_superuser %}
+  <div>
+    <a class="btn secondary" href="{% url 'product-update' product.pk %}">Edit product</a>
+    {% if product.is_active %}
+    <form method="post"
+          action="{% url 'product-deactivate' product.pk %}"
+          style="display: inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn danger">
+        Deactivate product
+      </button>
+    </form>
+    {% else %}
+        <form method="post"
+          action="{% url 'product-activate' product.pk %}"
+          style="display: inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn accent">
+        Activate product
+      </button>
+    </form>
+    {% endif %}
+  </div>
+  {% endif %}
 </div>
 <div class="card">
   <h3>Availability by warehouse</h3>

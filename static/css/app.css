@@ -69,6 +69,19 @@ button, input, select, textarea { font: inherit; }
   font-size: 11px; padding: 0 6px;
 }
 
+.status-badge {
+  min-width: 22px; height: 22px; display: inline-grid; place-items: center;
+  font-size: 11px; padding: 0 6px; border-radius: 2px;
+}
+
+.status-badge.status-active {
+  background: var(--warn); color: white;
+}
+
+.status-badge.status-inactive {
+  background: var(--muted); color: white;
+}
+
 .sidebar-foot { margin-top: auto; padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
 .sidebar-foot .who { font-size: 14px; }
 .sidebar-foot .role { color: #cbbba6; font-size: 12px; margin-top: 2px; }
@@ -87,8 +100,8 @@ button, input, select, textarea { font: inherit; }
 }
 .btn.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 .btn.low-warn { background: var(--low-warn); color: var(--line); border: 1px solid var(--muted); }
-.btn.accent { background: var(--accent); color: var(--card)}
-.btn.danger { background: var(--bad); }
+.btn.accent { background: var(--accent); color: var(--card); }
+.btn.danger { background: var(--bad); color: var(--card); }
 .btn.small { padding: 7px 12px; font-size: 13px; }
 
 .grid { display: grid; gap: 16px; }

@@ -11,7 +11,7 @@
 </div>
 <div class="card">
   <table>
-    <thead><tr><th>Code</th><th>Name</th><th>Location</th><th>On hand</th></tr></thead>
+    <thead><tr><th>Code</th><th>Name</th><th>Location</th><th>On hand</th><th>Action</th></tr></thead>
     <tbody>
       {% for w in warehouses %}
       <tr>
@@ -19,6 +19,39 @@
         <td>{{ w.name }}</td>
         <td>{{ w.location }}</td>
         <td>{{ w.on_hand }}</td>
+        {% if user.is_superuser %}
+        <td class="mono">
+          <!-- <a class="btn accent"  href="{% url 'warehouse-detail' w.pk %}">Detail</a> -->
+          {% if not w.is_opname %}
+          <form method="post"
+                action="{% url 'warehouse-lock-opname' w.pk %}"
+                style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn danger">
+              Lock for Opname
+            </button>
+          </form>
+          {% else %}
+              <form method="post"
+                action="{% url 'warehouse-unlock-opname' w.pk %}"
+                style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn accent">
+              Unlock Opname
+            </button>
+          </form>
+          {% endif %}
+        </td>
+        {% else %}
+        <td class="mono">
+          <!-- <a class="btn accent"  href="{% url 'warehouse-detail' w.pk %}">Detail</a> -->
+          {% if w.is_opname %}
+          <span class="status-badge status-active">In Stock Opname</span>
+          {% else %}
+          <span class="status-badge status-inactive">Not in Stock Opname</span>
+          {% endif %}
+        </td>
+        {% endif %}
       </tr>
       {% empty %}
       <tr><td colspan="4" class="empty">No warehouses yet.</td></tr>

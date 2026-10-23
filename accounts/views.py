@@ -34,7 +34,7 @@ class AuditListView(LoginRequiredMixin, ListView):
     model = Audit
     template_name = "accounts/audit_list.html"
     context_object_name = "entries"
-    paginate_by = 40
+    paginate_by = 20
 
 
 class UserListView(LoginRequiredMixin, ListView):

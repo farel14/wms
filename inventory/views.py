@@ -17,7 +17,7 @@ class StockListView(LoginRequiredMixin, ListView):
     model = Stock
     template_name = "inventory/stock_list.html"
     context_object_name = "stocks"
-    paginate_by = 40
+    paginate_by = 20
 
     def get_queryset(self):
         qs = Stock.objects.select_related("product", "warehouse")
@@ -38,7 +38,7 @@ class LedgerListView(LoginRequiredMixin, ListView):
     model = StockLedger
     template_name = "inventory/ledger_list.html"
     context_object_name = "entries"
-    paginate_by = 40
+    paginate_by = 20
 
     def get_queryset(self):
         qs = StockLedger.objects.select_related("product", "warehouse", "inventory_transaction", "created_by")
@@ -61,7 +61,7 @@ class TransactionListView(LoginRequiredMixin, ListView):
     model = InventoryTransaction
     template_name = "inventory/transaction_list.html"
     context_object_name = "transactions"
-    paginate_by = 25
+    paginate_by = 15
 
 
 class TransactionCreateView(LoginRequiredMixin, CreateView):
@@ -76,6 +76,24 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
+        
+        # check if warehouse opname is happening at the moment
+        warehouse = form.cleaned_data.get("warehouse")
+        if warehouse and warehouse.is_opname and not self.request.user.is_superuser:
+            form.add_error(
+                "warehouse",
+                "Cannot create transactions during stock opname.",
+            )
+            return self.form_invalid(form)
+        
+        destination_warehouse = form.cleaned_data.get("destination_warehouse")
+        if destination_warehouse and destination_warehouse.is_opname and not self.request.user.is_superuser:
+            form.add_error(
+                "destination_warehouse",
+                "Cannot create transactions during stock opname.",
+            )
+            return self.form_invalid(form)
+        
         response = super().form_valid(form)
         log_audit(
             user=self.request.user,

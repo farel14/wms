@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "accounts.apps.AccountsConfig",
+    "core",
     "warehouse",
     "catalog",
     "inventory",
@@ -59,7 +60,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-prefix = "WMS_" if os.getenv("ENVIRONMENT") == "production" else ""
+# prefix = "WMS_" if os.getenv("ENVIRONMENT") == "production" else ""
+prefix = ""
 
 DATABASES = {
     "default": {
