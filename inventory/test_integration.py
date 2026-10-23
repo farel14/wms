@@ -11,13 +11,22 @@ from .models import InventoryTransaction, Stock, StockLedger
 
 class InventoryViewIntegrationTests(TestCase):
     def setUp(self):
-        User = get_user_model()
-        self.user = User.objects.create_user("clerk", password="secret123")
-        self.admin = User.objects.create_superuser("admin", "admin@example.com", "secret123")
         self.jkt = Warehouse.objects.create(code="JKT", name="Jakarta", location="Cakung")
         self.sby = Warehouse.objects.create(code="SBY", name="Surabaya", location="Rungkut")
         self.product = Product.objects.create(name="Mineral Water", unit="EA")
-        self.client.login(username="clerk", password="secret123")
+        self._login_as_user()
+        
+    def _login_as_user(self):
+        User = get_user_model()
+        username, password="clerk", "secret123"
+        self.user = User.objects.create_user(username, password=password)
+        self.client.login(username=username, password=password)
+        
+    def _login_as_admin(self):
+        User = get_user_model()
+        username, password = "admin", "secret123"
+        self.admin = User.objects.create_superuser(username, "admin@example.com", password)
+        self.client.login(username=username, password=password)
 
     def _create_payload(self, **overrides):
         data = {
@@ -112,6 +121,7 @@ class InventoryViewIntegrationTests(TestCase):
         self.assertEqual(Stock.objects.get(product=self.product, warehouse=self.sby).quantity, 4)
 
     def test_cannot_create_transaction_during_opname(self):
+        # during opname normal users are not allowed to create transaction 
         self.jkt.is_opname = True
         self.jkt.save(update_fields=["is_opname"])
 
@@ -119,3 +129,25 @@ class InventoryViewIntegrationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Cannot create transactions during stock opname.")
         self.assertFalse(InventoryTransaction.objects.exists())
+
+    def test_create_transaction_during_opname_as_admin(self):
+        # during opname only superusers are allowed to create transaction 
+        self.jkt.is_opname = True
+        self.jkt.save(update_fields=["is_opname"])
+
+        self._login_as_admin()
+        response = self.client.post(reverse("transaction-create"), self._create_payload())
+        self.assertEqual(response.status_code, 302)
+
+        txn = InventoryTransaction.objects.get()
+        self.assertEqual(txn.status, InventoryTransaction.Status.DRAFT)
+        self.assertEqual(txn.created_by, self.admin)
+        self.assertTrue(
+            Audit.objects.filter(
+                action=Audit.Action.CREATE,
+                table_name="InventoryTransaction",
+                record_id=str(txn.pk),
+            ).exists()
+        )
+        self.assertRedirects(response, reverse("transaction-detail", args=[txn.pk]))
+

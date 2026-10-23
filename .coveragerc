@@ -6,3 +6,6 @@ omit =
     *wsgi.py
     *asgi.py
     *settings.py
+    *tests.py
+    *test_*.py 
+    *_tests.py

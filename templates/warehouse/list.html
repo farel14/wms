@@ -11,7 +11,7 @@
 </div>
 <div class="card">
   <table>
-    <thead><tr><th>Code</th><th>Name</th><th>Location</th><th>On hand</th><th>Status</th></tr></thead>
+    <thead><tr><th>Code</th><th>Name</th><th>Location</th><th>On hand</th><th>Action</th></tr></thead>
     <tbody>
       {% for w in warehouses %}
       <tr>
@@ -28,7 +28,7 @@
                 style="display: inline;">
             {% csrf_token %}
             <button type="submit" class="btn danger">
-              Lock Opname
+              Lock for Opname
             </button>
           </form>
           {% else %}
