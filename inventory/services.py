@@ -12,6 +12,13 @@ def _locked_stock(product, warehouse):
     return Stock.objects.select_for_update().get(product=product, warehouse=warehouse)
 
 
+def _lock_stocks_in_order(*pairs):
+    """Acquire row locks in a stable order so opposite transfers cannot deadlock."""
+    unique = {(product.pk, warehouse.pk): (product, warehouse) for product, warehouse in pairs}
+    for _, (product, warehouse) in sorted(unique.items()):
+        _locked_stock(product, warehouse)
+
+
 def _apply_delta(*, product, warehouse, quantity, txn, user):
     stock = _locked_stock(product, warehouse)
     new_qty = stock.quantity + quantity
@@ -33,8 +40,19 @@ def _apply_delta(*, product, warehouse, quantity, txn, user):
 
 
 def post_inventory_transaction(txn, user):
+    # check if transaction already posted
     if txn.status == InventoryTransaction.Status.POSTED:
         raise ValidationError("This transaction is already posted.")
+    # check if warehouse opname is happening at the moment
+    warehouse = txn.warehouse
+    if warehouse.is_opname and not user.is_superuser:
+        raise ValidationError("This transaction belongs to a warehouse undergoing stock opname")
+    # check if destination warehouse opname is happening at the moment
+    destination_warehouse = txn.destination_warehouse
+    if destination_warehouse:
+        if destination_warehouse.is_opname and not user.is_superuser:
+            raise ValidationError("This transaction belongs to a warehouse undergoing stock opname")
+    
     txn.clean()
     with transaction.atomic():
         txn = InventoryTransaction.objects.select_for_update().get(pk=txn.pk)
@@ -48,6 +66,10 @@ def post_inventory_transaction(txn, user):
         elif txn.transaction_type == InventoryTransaction.Type.ADJUST:
             _apply_delta(product=txn.product, warehouse=txn.warehouse, quantity=txn.quantity, txn=txn, user=user)
         elif txn.transaction_type == InventoryTransaction.Type.TRANSFER:
+            _lock_stocks_in_order(
+                (txn.product, txn.warehouse),
+                (txn.product, txn.destination_warehouse),
+            )
             _apply_delta(product=txn.product, warehouse=txn.warehouse, quantity=-txn.quantity, txn=txn, user=user)
             _apply_delta(
                 product=txn.product,

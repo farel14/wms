@@ -6,6 +6,7 @@ class Warehouse(models.Model):
     code = models.CharField("warehouse code", max_length=16, unique=True)
     name = models.CharField(max_length=120)
     location = models.CharField(max_length=255)
+    is_opname = models.BooleanField(default=False)
 
     class Meta:
         db_table = "warehouse"

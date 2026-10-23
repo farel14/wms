@@ -97,8 +97,8 @@ class ProductDeactivateView(LoginRequiredMixin, View):
             user=self.request.user,
             action=Audit.Action.DEACTIVATE,
             table_name="Product",
-            record_id=self.product.pk,
-            description=f"Deactivate product {self.product.name}",
+            record_id=product.pk,
+            description=f"Deactivate product {product.name}",
         )
 
         return redirect("product-detail", pk=product.pk)
