@@ -50,3 +50,9 @@ class Product(models.Model):
     @property
     def on_hand(self):
         return self.stocks.aggregate(total=Sum("quantity"))["total"] or 0
+
+    @property
+    def on_hand_each(self):
+        if self.unit in self.UNIT_TO_EACH:
+            return int(self.on_hand * self.UNIT_TO_EACH[self.unit]) or 0
+        return 0

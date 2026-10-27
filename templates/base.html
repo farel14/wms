@@ -29,6 +29,12 @@
       <a href="{% url 'transaction-list' %}" class="{% if 'transaction' in request.resolver_match.url_name %}active{% endif %}">
         Inventory transactions {% if draft_txn_count %}<span class="badge">{{ draft_txn_count }}</span>{% endif %}
       </a>
+      <a href="{% url 'inbound-list' %}" class="{% if 'inbound' in request.resolver_match.url_name %}active{% endif %}">
+        Inbound {% if draft_inbound_count %}<span class="badge">{{ draft_inbound_count }}</span>{% endif %}
+      </a>
+      <a href="{% url 'outbound-list' %}" class="{% if 'outbound' in request.resolver_match.url_name %}active{% endif %}">
+        Outbound {% if draft_outbound_count %}<span class="badge">{{ draft_outbound_count }}</span>{% endif %}
+      </a>
       <a href="{% url 'ledger-list' %}" class="{% if request.resolver_match.url_name == 'ledger-list' %}active{% endif %}">Stock ledger</a>
       {% if user.is_superuser %}
         <a href="{% url 'audit-list' %}" class="{% if request.resolver_match.url_name == 'audit-list' %}active{% endif %}">Audit</a>

@@ -1,4 +1,5 @@
 from inventory.models import InventoryTransaction
+from operations.models import OutboundOrder, InboundShipment
 
 
 def nav_counts(request):
@@ -6,6 +7,8 @@ def nav_counts(request):
         return {}
     return {
         "draft_txn_count": InventoryTransaction.objects.filter(status=InventoryTransaction.Status.DRAFT).count(),
+        "draft_inbound_count": InboundShipment.objects.filter(status=InboundShipment.Status.DRAFT).count(),
+        "draft_outbound_count": OutboundOrder.objects.filter(status=OutboundOrder.Status.DRAFT).count(),
     }
 
 def user_group_names(request):

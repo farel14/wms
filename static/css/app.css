@@ -105,6 +105,8 @@ button, input, select, textarea { font: inherit; }
 .btn.danger { background: var(--bad); color: var(--card); }
 .btn.small { padding: 7px 12px; font-size: 13px; }
 
+.multi-button { display: inline-flex; gap: 8px; }
+
 .grid { display: grid; gap: 16px; }
 .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .split { grid-template-columns: 1.4fr 1fr; }
