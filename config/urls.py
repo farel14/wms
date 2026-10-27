@@ -4,8 +4,8 @@ from django.urls import include, path
 
 from accounts.views import AuditListView, DashboardView, UserListView
 
-admin.site.site_header = "Harbor WMS"
-admin.site.site_title = "Harbor WMS"
+admin.site.site_header = "WMS TOYLAND"
+admin.site.site_title = "WMS TOYLAND"
 admin.site.index_title = "Administration"
 
 urlpatterns = [
