@@ -12,9 +12,23 @@ def next_sku(model, prefix="SKU", field="sku"):
     return f"{head}{seq:03d}"
 
 class Product(models.Model):
+    
+    class MeasurementUnit(models.TextChoices):
+        EA = "EA", "Each"
+        PK = "PK", "Pack"
+        CS = "CS", "Case"
+        PLT = "PLT", "Pallet"
+        
+    UNIT_TO_EACH = {
+        MeasurementUnit.EA: 1.0,
+        MeasurementUnit.PK: 6.0,
+        MeasurementUnit.CS: 24.0,
+        MeasurementUnit.PLT: 1200.0,
+    }
+    
     sku = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=255)
-    unit = models.CharField(max_length=16)
+    unit = models.CharField(max_length=16, choices=MeasurementUnit.choices, default=MeasurementUnit.EA)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

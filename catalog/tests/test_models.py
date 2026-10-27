@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.db import IntegrityError, transaction
 from inventory.models import Product, Stock, Warehouse
+from catalog.utils import convert_to_unit
 
 class ProductModelTest(TestCase):
     def setUp(self):
@@ -73,3 +74,21 @@ class ProductModelTest(TestCase):
         )
 
         self.assertEqual(self.product.on_hand, 35)
+
+class UnitConversionTestCase(TestCase):
+    def test_convert_to_unit(self):
+        # Test conversion from Each to Pack
+        value_in_pack = convert_to_unit(12, Product.MeasurementUnit.EA, Product.MeasurementUnit.PK)
+        self.assertEqual(value_in_pack, 2.0)
+
+        # Test conversion from Pack to Each
+        value_in_each = convert_to_unit(3, Product.MeasurementUnit.PK, Product.MeasurementUnit.EA)
+        self.assertEqual(value_in_each, 18.0)
+
+        # Test conversion from Each to Case
+        value_in_case = convert_to_unit(36, Product.MeasurementUnit.EA, Product.MeasurementUnit.CS)
+        self.assertEqual(value_in_case, 1.5)
+
+        # Test conversion from Each to Pallet
+        value_in_each_from_pallet = convert_to_unit(1200, Product.MeasurementUnit.EA, Product.MeasurementUnit.PLT)
+        self.assertEqual(value_in_each_from_pallet, 1.0)

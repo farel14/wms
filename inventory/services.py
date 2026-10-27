@@ -43,6 +43,8 @@ def post_inventory_transaction(txn, user):
     # check if transaction already posted
     if txn.status == InventoryTransaction.Status.POSTED:
         raise ValidationError("This transaction is already posted.")
+    if txn.status == InventoryTransaction.Status.CANCELLED:
+        raise ValidationError("This transaction is cancelled and cannot be posted.")
     # check if warehouse opname is happening at the moment
     warehouse = txn.warehouse
     if warehouse.is_opname and not user.is_superuser:
@@ -52,6 +54,7 @@ def post_inventory_transaction(txn, user):
     if destination_warehouse:
         if destination_warehouse.is_opname and not user.is_superuser:
             raise ValidationError("This transaction belongs to a warehouse undergoing stock opname")
+        
     
     txn.clean()
     with transaction.atomic():
@@ -60,8 +63,10 @@ def post_inventory_transaction(txn, user):
             raise ValidationError("This transaction is already posted.")
 
         if txn.transaction_type == InventoryTransaction.Type.IN:
+            receive_stock(txn, user)
             _apply_delta(product=txn.product, warehouse=txn.warehouse, quantity=txn.quantity, txn=txn, user=user)
         elif txn.transaction_type == InventoryTransaction.Type.OUT:
+            pick_stock(txn, user)
             _apply_delta(product=txn.product, warehouse=txn.warehouse, quantity=-txn.quantity, txn=txn, user=user)
         elif txn.transaction_type == InventoryTransaction.Type.ADJUST:
             _apply_delta(product=txn.product, warehouse=txn.warehouse, quantity=txn.quantity, txn=txn, user=user)
@@ -91,3 +96,9 @@ def post_inventory_transaction(txn, user):
         description=f"Posted {txn.number} ({txn.get_transaction_type_display()}) {txn.quantity} {txn.product.unit} of {txn.product.name}",
     )
     return txn
+
+def pick_stock(txn, user):
+    pass
+
+def receive_stock(txn, user):
+    pass

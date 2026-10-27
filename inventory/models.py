@@ -42,8 +42,9 @@ class InventoryTransaction(models.Model):
         ADJUST = "ADJUST", "Adjustment"
 
     class Status(models.TextChoices):
-        DRAFT = "DRAFT", "Draft"
-        POSTED = "POSTED", "Posted"
+        DRAFT = "DRAFT", "Draft" # start of transaction, estimation, picking products
+        POSTED = "POSTED", "Posted" # delivered
+        CANCELLED = "CANCELLED", "Cancelled"
 
     number = models.CharField(max_length=32, unique=True)
     transaction_type = models.CharField(max_length=16, choices=Type.choices)

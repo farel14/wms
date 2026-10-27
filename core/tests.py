@@ -1,42 +1,27 @@
 from django.test import TestCase
-# from django.contrib.auth.models import User
-# from .models import Audit, log_audit
-from .constants import MeasurementUnit
 from catalog.models import Product
-from faker import Faker
 
 # Create your tests here.
 
-class ConstantTestCase(TestCase):
-    
-    def test_unit_ea(self):
-        self.assertEqual(MeasurementUnit.EA.symbol, "ea")
-        self.assertEqual(MeasurementUnit.EA.label, "Each")
-        self.assertEqual(MeasurementUnit.EA.to_each, 1.0)
-
-    def test_convert(self):
-        self.assertEqual(MeasurementUnit.PK.to_each * 2, MeasurementUnit.PK.convert_to(2, MeasurementUnit.EA))
-        
 class ActiveQuerySetTestCase(TestCase):
     
     def setUp(self):
-        fake = Faker()
         self.active_product_1 = Product.objects.create(
-            name="Rice",
-            unit="kg",
-            description="Premium rice",
+            name="Water Gun",
+            unit=Product.MeasurementUnit.EA,
+            description="High capacity watergun",
             is_active=True
         )
         self.active_product_2 = Product.objects.create(
-            name="Tofu",
-            unit="pcs",
-            description="Low quality tofu",
+            name="Glitter Bomb",
+            unit=Product.MeasurementUnit.PK,
+            description="Prank glitter bomb for fun",
             # is_active=True by default
         )
         self.inactive_product_1 = Product.objects.create(
-            name="Corn",
-            unit="cobs",
-            description="Corniest corn ever exist",
+            name="Fake corn",
+            unit=Product.MeasurementUnit.EA,
+            description="The fakest corn ever exist",
             is_active=False
         )
 
