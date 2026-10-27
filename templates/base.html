@@ -38,6 +38,7 @@
     <div class="sidebar-foot">
       <div class="who">{{ user.get_full_name|default:user.username }}</div>
       <div class="role">{% if user.is_superuser %}Administrator{% elif user.is_staff %}Staff{% else %}User{% endif %}</div>
+      <div class="group">{{ user_group_names|default:"No group" }}</div>
       <form method="post" action="{% url 'logout' %}" style="margin-top:12px">
         {% csrf_token %}
         <button class="btn low-warn small" type="submit">Sign out</button>

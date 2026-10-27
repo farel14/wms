@@ -11,13 +11,14 @@
 </div>
 <div class="card">
   <table>
-    <thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Staff</th><th>Active</th></tr></thead>
+    <thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Groups</th><th>Staff</th><th>Active</th></tr></thead>
     <tbody>
       {% for u in users %}
       <tr>
         <td class="mono">{{ u.username }}</td>
         <td>{{ u.get_full_name|default:"—" }}</td>
         <td>{{ u.email|default:"—" }}</td>
+        <td>{{ u.group_names|default:"No group" }}</td>
         <td>{% if u.is_staff %}Yes{% else %}No{% endif %}</td>
         <td>{% if u.is_active %}Yes{% else %}No{% endif %}</td>
       </tr>

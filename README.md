@@ -45,9 +45,13 @@ python manage.py seed_demo
 python manage.py runserver
 ```
 
-for running shell, testing:
+for testing, running shell:
 ```bash
 python manage.py shell
+```
+for testing, reset db:
+```bash
+python manage.py reset_demo
 ```
 
 Open http://127.0.0.1:8000 — `admin / admin123` or `operator / operator123`.

@@ -41,4 +41,14 @@ class UserListView(LoginRequiredMixin, ListView):
     model = User
     template_name = "accounts/user_list.html"
     context_object_name = "users"
-    queryset = User.objects.order_by("username")
+    queryset = User.objects.order_by("username").prefetch_related("groups")
+
+    def get_queryset(self):
+        users = super().get_queryset()
+
+        for user in users:
+            user.group_names = ", ".join(
+                user.groups.values_list("name", flat=True)
+            )
+
+        return users

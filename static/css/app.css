@@ -85,6 +85,7 @@ button, input, select, textarea { font: inherit; }
 .sidebar-foot { margin-top: auto; padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
 .sidebar-foot .who { font-size: 14px; }
 .sidebar-foot .role { color: #cbbba6; font-size: 12px; margin-top: 2px; }
+.sidebar-foot .group { color: #cbbba6; font-size: 12px; margin-top: 2px; }
 
 .main { padding: 28px 32px 48px; }
 .topbar { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px; }
