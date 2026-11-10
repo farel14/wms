@@ -5,25 +5,13 @@ from django.utils import timezone
 
 from catalog.models import Product
 from warehouse.models import Warehouse
+from core.models import TimestampedModel, ImmutableMixin
 
 
-class ImmutableMixin:
-    """Create and read only. Existing rows cannot be updated or deleted."""
-
-    def save(self, *args, **kwargs):
-        if self.pk and type(self).objects.filter(pk=self.pk).exists():
-            raise ValidationError("This record is write-once and cannot be edited.")
-        super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        raise ValidationError("This record cannot be deleted.")
-
-
-class Stock(models.Model):
+class Stock(TimestampedModel):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="stocks")
     warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, related_name="stocks")
     quantity = models.PositiveIntegerField(default=0)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "stock"
@@ -104,7 +92,7 @@ class InventoryTransaction(models.Model):
             raise ValidationError("Destination warehouse is only used for transfers.")
 
 
-class StockLedger(ImmutableMixin, models.Model):
+class StockLedger(ImmutableMixin, TimestampedModel):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="ledger_entries")
     warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, related_name="ledger_entries")
     quantity = models.IntegerField(help_text="Positive increases stock, negative decreases it.")

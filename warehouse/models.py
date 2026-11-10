@@ -2,9 +2,10 @@ from django.db import models
 from django.db.models import Sum
 from catalog.utils import convert_to_unit
 from catalog.models import Product
+from core.models import TimestampedModel
 
 
-class Warehouse(models.Model):
+class Warehouse(TimestampedModel):
     code = models.CharField("warehouse code", max_length=16, unique=True)
     name = models.CharField(max_length=120)
     location = models.CharField(max_length=255)
@@ -36,13 +37,11 @@ class Warehouse(models.Model):
         return int(stock_count) or 0
 
 # Location of the product in the warehouse, e.g. A1, B2, etc.
-class Location(models.Model):
+class Location(TimestampedModel):
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, related_name="locations")
     code = models.CharField(max_length=32)
     description = models.CharField(max_length=255, blank=True)
     is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "location"

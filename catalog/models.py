@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Sum
-from core.models import ActiveQuerySet
+from core.models import ActiveQuerySet, TimestampedModel
 
 
 def next_sku(model, prefix="SKU", field="sku"):
@@ -11,7 +11,7 @@ def next_sku(model, prefix="SKU", field="sku"):
         seq = int(getattr(last, field).rsplit("-", 1)[-1]) + 1
     return f"{head}{seq:03d}"
 
-class Product(models.Model):
+class Product(TimestampedModel):
     
     class MeasurementUnit(models.TextChoices):
         EA = "EA", "Each"
@@ -31,8 +31,6 @@ class Product(models.Model):
     unit = models.CharField(max_length=16, choices=MeasurementUnit.choices, default=MeasurementUnit.EA)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     
     objects = ActiveQuerySet.as_manager()
     class Meta:
