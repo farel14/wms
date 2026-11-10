@@ -1,6 +1,7 @@
 # WMS TOYLAND
 
 Warehouse management with **Django 5** and **PostgreSQL**.
+Live Demo: [wms-five-azure.vercel.app/](https://wms-five-azure.vercel.app)
 
 ## Tables
 
