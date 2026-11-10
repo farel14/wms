@@ -1,6 +1,7 @@
 # WMS TOYLAND
 
 Warehouse management with **Django 5** and **PostgreSQL**.
+
 Live Demo: [wms-five-azure.vercel.app/](https://wms-five-azure.vercel.app)
 
 ## Tables
@@ -12,10 +13,20 @@ Live Demo: [wms-five-azure.vercel.app/](https://wms-five-azure.vercel.app)
 | `stock` | Available quantity of a product in a warehouse |
 | `stock_ledger` | Append-only history of stock movements (write + read, never edit) |
 | `inventory_transaction` | Stock in, stock out, transfer, and adjustment events |
+| `operations_inboundshipment` | Supplier shipment expected at a warehouse, including status and expected date |
+| `operations_inboundline` | Product and expected/received quantities for an inbound shipment, with an optional putaway location |
+| `operations_inboundreceipt` | Record of a received quantity, its putaway location, and the inventory transaction that records the stock-in |
+| `operations_outboundline` | Product and requested/picked quantities for an outbound order, with an optional pick location |
+| `operations_outboundorder` | Customer order to be picked and shipped from a warehouse, including status and required date |
+| `location` | Stock location within designated warehouses |
 | `audit` | Append-only user activity history |
 | `auth_user` | Django user accounts |
 
+
 Stock quantity changes only when an inventory transaction is **posted**. Posting writes ledger rows and updates `stock`. Ledger and audit rows cannot be updated or deleted.
+
+## ERD
+![ERD](static/images/wms-erd.png)
 
 ## Setup
 
