@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from core.models import ImmutableMixin, TimestampedModel
 
 
-class Audit(models.Model):
+class Audit(ImmutableMixin, TimestampedModel):
     # action enum
     class Action(models.TextChoices):
         LOGIN = 'LOGIN', 'Login'
@@ -25,7 +26,6 @@ class Audit(models.Model):
     table_name = models.CharField(max_length=64, blank=True)
     record_id = models.CharField(max_length=64, blank=True)
     description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "audit"

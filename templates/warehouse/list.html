@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Warehouses · Harbor WMS{% endblock %}
+{% block title %}Warehouses · WMS Toyland{% endblock %}
 {% block content %}
 <div class="topbar">
   <div>
@@ -11,14 +11,14 @@
 </div>
 <div class="card">
   <table>
-    <thead><tr><th>Code</th><th>Name</th><th>Location</th><th>On hand</th><th>Action</th></tr></thead>
+    <thead><tr><th>Code</th><th>Name</th><th>Location</th><th>On hand (each)</th><th>Action</th></tr></thead>
     <tbody>
       {% for w in warehouses %}
       <tr>
         <td class="mono"><a href="{% url 'warehouse-detail' w.pk %}">{{ w.code }}</a></td>
         <td>{{ w.name }}</td>
         <td>{{ w.location }}</td>
-        <td>{{ w.on_hand }}</td>
+        <td>{{ w.on_hand_each }}</td>
         {% if user.is_superuser %}
         <td class="mono">
           <!-- <a class="btn accent"  href="{% url 'warehouse-detail' w.pk %}">Detail</a> -->

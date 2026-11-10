@@ -3,6 +3,8 @@ from django.db import models
 from django.utils import timezone
 
 from catalog.models import Product
+from core.models import TimestampedModel
+from inventory.models import InventoryTransaction
 from warehouse.models import Location, Warehouse
 
 
@@ -16,7 +18,7 @@ def next_document_number(model, prefix, field="number"):
     return f"{head}{seq:04d}"
 
 
-class InboundShipment(models.Model):
+class InboundShipment(TimestampedModel):
     class Status(models.TextChoices):
         DRAFT = "DRAFT", "Draft"
         RECEIVING = "RECEIVING", "Receiving"
@@ -32,7 +34,6 @@ class InboundShipment(models.Model):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="created_inbounds"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
     received_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -47,7 +48,7 @@ class InboundShipment(models.Model):
         super().save(*args, **kwargs)
 
 
-class InboundLine(models.Model):
+class InboundLine(TimestampedModel):
     shipment = models.ForeignKey(InboundShipment, on_delete=models.CASCADE, related_name="lines")
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     expected_qty = models.PositiveIntegerField()
@@ -61,7 +62,23 @@ class InboundLine(models.Model):
         return max(self.expected_qty - self.received_qty, 0)
 
 
-class OutboundOrder(models.Model):
+class InboundReceipt(TimestampedModel):
+    line = models.ForeignKey(InboundLine, on_delete=models.PROTECT, related_name="receipts")
+    inventory_transaction = models.OneToOneField(
+        InventoryTransaction, on_delete=models.PROTECT, related_name="inbound_receipt"
+    )
+    quantity = models.PositiveIntegerField()
+    putaway_location = models.ForeignKey(Location, on_delete=models.PROTECT)
+    received_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="inbound_receipts"
+    )
+    received_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-received_at", "-id"]
+
+
+class OutboundOrder(TimestampedModel):
     class Status(models.TextChoices):
         DRAFT = "DRAFT", "Draft"
         PICKING = "PICKING", "Picking"
@@ -74,10 +91,10 @@ class OutboundOrder(models.Model):
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.DRAFT)
     required_date = models.DateField(null=True, blank=True)
     notes = models.TextField(blank=True)
+    transaction = models.ForeignKey(InventoryTransaction, on_delete=models.SET_NULL, null=True, blank=True, related_name="outbound_orders")
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="created_outbounds"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
     shipped_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -92,7 +109,7 @@ class OutboundOrder(models.Model):
         super().save(*args, **kwargs)
 
 
-class OutboundLine(models.Model):
+class OutboundLine(TimestampedModel):
     order = models.ForeignKey(OutboundOrder, on_delete=models.CASCADE, related_name="lines")
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     requested_qty = models.PositiveIntegerField()

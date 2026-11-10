@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, View
 
-from inventory.services import pick_stock, receive_stock
+from inventory.services import receive_inbound_line
 
 from .forms import (
     InboundLineForm,
@@ -90,31 +90,21 @@ class InboundReceiveLineView(LoginRequiredMixin, View):
             return redirect("inbound-detail", pk=pk)
         qty = form.cleaned_data["quantity"]
         location = form.cleaned_data["location"]
-        if location.warehouse_id != shipment.warehouse_id:
-            messages.error(request, "Putaway location must belong to this warehouse.")
-            return redirect("inbound-detail", pk=pk)
-        if qty > line.remaining():
-            messages.error(request, "Cannot receive more than the remaining expected quantity.")
-            return redirect("inbound-detail", pk=pk)
         try:
-            with transaction.atomic():
-                receive_stock(
-                    product=line.product,
-                    location=location,
-                    quantity=qty,
-                    user=request.user,
-                    reference=shipment.number,
-                )
-                line.received_qty += qty
-                line.putaway_location = location
-                line.save(update_fields=["received_qty", "putaway_location"])
-                if shipment.status == InboundShipment.Status.DRAFT:
-                    shipment.status = InboundShipment.Status.RECEIVING
-                    shipment.save(update_fields=["status"])
+            receive_inbound_line(
+                shipment_id=shipment.pk,
+                line_id=line.pk,
+                quantity=qty,
+                location=location,
+                user=request.user,
+            )
         except ValidationError as exc:
             messages.error(request, " ".join(exc.messages))
         else:
-            messages.success(request, f"Received {qty} {line.product.unit} of {line.product.sku}.")
+            messages.success(
+                request,
+                f"Received {qty} {line.product.unit} of {line.product.sku}. Stock updated.",
+            )
         return redirect("inbound-detail", pk=pk)
 
 
@@ -209,13 +199,13 @@ class OutboundPickLineView(LoginRequiredMixin, View):
             return redirect("outbound-detail", pk=pk)
         try:
             with transaction.atomic():
-                pick_stock(
-                    product=line.product,
-                    location=location,
-                    quantity=qty,
-                    user=request.user,
-                    reference=order.number,
-                )
+                # pick_stock(
+                #     product=line.product,
+                #     location=location,
+                #     quantity=qty,
+                #     user=request.user,
+                #     reference=order.number,
+                # )
                 line.picked_qty += qty
                 line.pick_location = location
                 line.save(update_fields=["picked_qty", "pick_location"])

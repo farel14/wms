@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, View
@@ -10,7 +11,7 @@ from accounts.models import log_audit, Audit
 
 from .forms import InventoryTransactionForm
 from .models import InventoryTransaction, Stock, StockLedger
-from .services import post_inventory_transaction
+from .services import post_inventory_transaction, create_inbound_transaction, create_outbound_transaction
 
 
 class StockListView(LoginRequiredMixin, ListView):
@@ -79,6 +80,7 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         
         # check if warehouse opname is happening at the moment
         warehouse = form.cleaned_data.get("warehouse")
+        notes = form.cleaned_data.get("notes")
         if warehouse and warehouse.is_opname and not self.request.user.is_superuser:
             form.add_error(
                 "warehouse",
@@ -95,6 +97,35 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
             return self.form_invalid(form)
         
         response = super().form_valid(form)
+        log_audit(
+            user=self.request.user,
+            action=Audit.Action.CREATE,
+            table_name="InventoryTransaction",
+            record_id=self.object.pk,
+            description=f"Created {self.object.number}",
+        )
+        if form.cleaned_data.get("transaction_type") == InventoryTransaction.Type.IN:
+            supplier_name = form.cleaned_data.get("supplier_name")
+            expected_date = form.cleaned_data.get("expected_date")
+            with transaction.atomic():
+                create_inbound_transaction(
+                    warehouse=warehouse,
+                    expected_date=expected_date,
+                    notes=notes,
+                    supplier_name=supplier_name,
+                    user=self.request.user
+                )
+        elif form.cleaned_data.get("transaction_type") == InventoryTransaction.Type.OUT:
+            customer_name = form.cleaned_data.get("customer_name")
+            required_date = form.cleaned_data.get("required_date")
+            with transaction.atomic():
+                create_outbound_transaction(
+                    warehouse=warehouse,
+                required_date=required_date,
+                notes=notes,
+                customer_name=customer_name,
+                user=self.request.user
+            )
         log_audit(
             user=self.request.user,
             action=Audit.Action.CREATE,
