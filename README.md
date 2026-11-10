@@ -28,6 +28,9 @@ Stock quantity changes only when an inventory transaction is **posted**. Posting
 ## ERD
 ![ERD](static/images/wms-erd.png)
 
+## Business Flow
+![flow](static/images/wms-flow.png)
+
 ## Setup
 
 for development
