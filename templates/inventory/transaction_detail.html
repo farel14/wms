@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ inventorytransaction.number }} · Harbor WMS{% endblock %}
+{% block title %}{{ inventorytransaction.number }} · WMS Toyland{% endblock %}
 {% block content %}
 <div class="topbar">
   <div>
@@ -22,11 +22,15 @@
     <p><span class="muted">Posted</span><br>{{ inventorytransaction.posted_at }}</p>
     {% endif %}
     {% if inventorytransaction.status == "DRAFT" %}
+    <span class="multi-button">
+    <a class="btn accent" href="{% url 'inbound-list' %}" style="margin-top:16px">Go to Inbound/Outbound</a>
+    {% if user.is_superuser %}
     <form method="post" action="{% url 'transaction-post' inventorytransaction.pk %}" style="margin-top:16px">
       {% csrf_token %}
-      <button class="btn accent" type="submit">Post transaction</button>
+      <button class="btn danger" type="submit">Post transaction</button>
     </form>
-    <p class="help">Posting writes the stock ledger and updates warehouse availability. After that this record cannot be edited.</p>
+    {% endif %}
+    </span>
     {% endif %}
   </article>
   <article class="card">

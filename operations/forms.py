@@ -59,6 +59,6 @@ class PickLineForm(forms.Form):
         qs = Location.objects.filter(is_active=True)
         if warehouse:
             qs = qs.filter(warehouse=warehouse)
-        if product:
-            qs = qs.filter(balances__product=product, balances__quantity__gt=0)
+        # if product:
+        #     qs = qs.filter(balances__product=product, balances__quantity__gt=0)
         self.fields["location"].queryset = qs.distinct()

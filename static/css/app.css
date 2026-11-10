@@ -85,6 +85,7 @@ button, input, select, textarea { font: inherit; }
 .sidebar-foot { margin-top: auto; padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
 .sidebar-foot .who { font-size: 14px; }
 .sidebar-foot .role { color: #cbbba6; font-size: 12px; margin-top: 2px; }
+.sidebar-foot .group { color: #cbbba6; font-size: 12px; margin-top: 2px; }
 
 .main { padding: 28px 32px 48px; }
 .topbar { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px; }
@@ -103,6 +104,8 @@ button, input, select, textarea { font: inherit; }
 .btn.accent { background: var(--accent); color: var(--card); }
 .btn.danger { background: var(--bad); color: var(--card); }
 .btn.small { padding: 7px 12px; font-size: 13px; }
+
+.multi-button { display: inline-flex; gap: 8px; }
 
 .grid { display: grid; gap: 16px; }
 .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
